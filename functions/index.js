@@ -1,4 +1,4 @@
-const functions = require('firebase-functions');
+const functions = require('firebase-functions'); 
 
 const { processWebhookMessage } = require('./lib/service/processWebhookMessages')
 const { receivedChanges } = require('./lib/service/processWebhookChanges')
@@ -44,7 +44,7 @@ const webhookImpl = (req, res) => {
             if (pageEntry.changes !== undefined) {
                 pageEntry.changes.forEach(async function (change) {
                     console.log(change)
-                    await receivedChanges(change);
+                    await processWebhookChanges(change);
                 });
             }
         });

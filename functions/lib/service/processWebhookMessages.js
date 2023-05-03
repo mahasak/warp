@@ -8,6 +8,8 @@ const Pipeline = require('../pipeline')
 const PAGE_IDS = functions.config().warp.facebook.page_id;
 
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
+
+const { bankslipDetectionQuickReplyHook } = require('../features/BankSlipDetection')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessage = async (event) => {
@@ -66,14 +68,9 @@ const receivedMessage = async (event) => {
             const quickReplyPayload = message.quick_reply.payload
             logger.info(`Quick reply for message ${message.mid} with payload ${quickReplyPayload}`)
             
-            if(pages_config.features.slip_detection_api === 'true') {
-                if (quickReplyPayload === 'YES_RETRY_CONFIRMATION') {
-                    await sendTextMessage(recipientID, senderID, "Sorry, we're unable to do re-confirmation at the moments !")
-                }
-
-                if (quickReplyPayload === 'NO_RETRY_CONFIRMATION') {
-                    await sendTextMessage(recipientID, senderID, "Thankyou we valued your opinions. Good day !")
-                }
+            // Bankslip detection api feature
+            if(pages_config && pages_config.features.slip_detection_api === 'true') {
+                await bankslipDetectionQuickReplyHook(event);
             }
         }
 
