@@ -1,7 +1,7 @@
 const functions = require('firebase-functions'); 
 
-const { processWebhookMessage } = require('./lib/service/processWebhookMessages')
-const { receivedChanges } = require('./lib/service/processWebhookChanges')
+const { processWebhookMessages } = require('./lib/service/processWebhookMessages')
+const { processWebhookChanges } = require('./lib/service/processWebhookChanges')
 const { debug, logger } = require('./lib/logger')
 
 exports.webhook = functions.https.onRequest((req, res) => {
@@ -37,7 +37,7 @@ const webhookImpl = (req, res) => {
             // process messaging
             if (pageEntry.messaging !== undefined) {
                 pageEntry.messaging.forEach(async function (event) {
-                    await processWebhookMessage(event)
+                    await processWebhookMessages(event)
                 });
             }
             //process changes

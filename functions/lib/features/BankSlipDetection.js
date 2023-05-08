@@ -53,6 +53,26 @@ exports.bankslipDetectionChangesHook = async (change) => {
 
     if (change.value.event === 'bank_slip_verified') {
         debug('BANK SLIP VERIFIED', change)
+        debug('BANK SLIP VERIFIED, PAYMENT DETAILS', change.value.payment)
+        debug('BANK SLIP VERIFIED, PAYMENT METADATA', change.value.payment.metadata)
+        debug('BANK SLIP VERIFIED, PAYMENT VALIDATION INFO', change.value.payment.metadata.bank_slip.validation_status)
+
+        const message = "Your payment verified, This is your payment information:\n" +
+            "Time: " + change.value.timestamp + "\n" +
+            "Buyer ID: " + change.value.buyer_id + "\n" +
+            "Page ID: " + change.value.page_id + "\n" +
+            "Event: " + change.value.event + "\n" +
+            "Payment Method: " + change.value.payment.payment_method + "\n" +
+            "Payment amount: " + `${change.value.payment.payment_amount.amount} ${change.value.payment.payment_amount.currency}` + "\n" +
+            "Transaction ID: " + change.value.payment.metadata.bank_slip.bank_transfer_id + "\n" +
+            "Transaction ID: " + change.value.payment.metadata.bank_slip.transaction_time + "\n" +
+            "Payment Validation: " + change.value.payment.metadata.bank_slip.validation_status + "\n" +
+            "Sender Info: " + `${change.value.payment.metadata.bank_slip.sender_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id}` + "\n" +
+            "Receiver Info: " + `${change.value.payment.metadata.bank_slip.receiver_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id}` + "\n"
+
+            
+
+        await sendTextMessage(change.value.page_id, change.value.payment.buyer_id, message)
     }
 }
 

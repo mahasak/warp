@@ -12,7 +12,7 @@ const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 const { bankslipDetectionQuickReplyHook } = require('../features/BankSlipDetection')
 const { debug, logger } = require('../logger')
 
-exports.processWebhookMessage = async (event) => {
+exports.processWebhookMessages = async (event) => {
     if (event.message) {
         await receivedMessage(event)
     } else if (event.delivery) {
