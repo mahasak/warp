@@ -21,6 +21,27 @@ exports.sendTextMessage = async (page_id, recipientId, messageText) => {
     await callSendAPI(page_id, messageData)
 }
 
+exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
+    logger.info(`[messenger] Sending generic message to PSID: ${recipientId}, page: ${page_id}`)
+
+    const messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type:  "template",
+                payload: {
+                    template_type: "generic",
+                    elements: elements
+                }
+            }
+        }
+    }
+
+    await callSendAPI(page_id, messageData)
+}
+
 exports.sendMessageTemplate = async (page_id, recipientId, template) => {
     logger.info(`[messenger] Sending text message to PSID: ${recipientId}, page: ${page_id}`)
 
@@ -102,6 +123,8 @@ const callSendAPI = async (page_id, messageData) => {
         const recipientId = data.recipient_id
         const messageId = data.message_id
 
+        console.log(data)
+
         if (res.ok) {
             logger.info(`[messenger] Successfully send message to PSID: ${recipientId} ${messageId !== undefined ? 'messageId:' + messageId : ''}`)
         } else {
@@ -113,7 +136,7 @@ const callSendAPI = async (page_id, messageData) => {
 }
 
 exports.markSeen = async (page_id, psid) => {
-    logger.info('[messenger] Marking messages as seen')
+    logger.info(`[messenger] Marking messages as seen for ${psid}`)
 
     const messageData = {
         recipient: {

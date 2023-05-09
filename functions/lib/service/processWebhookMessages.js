@@ -9,7 +9,7 @@ const PAGE_IDS = functions.config().warp.facebook.page_id;
 
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
-const { bankslipDetectionQuickReplyHook } = require('../features/BankSlipDetection')
+const { bankslipDetectionQuickReplyHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessages = async (event) => {
@@ -27,6 +27,28 @@ exports.processWebhookMessages = async (event) => {
         logger.error(`Webhook received unknown messagingEvent: ${event}`)
     }
 }
+
+const receivedPostback = async (event) => {
+    const senderID = event.sender.id
+    const recipientID = event.recipient.id
+    const postback = event.postback
+
+    // debug('Incoming event', event)
+    // debug('Incoming message', message)
+
+    // PSID not in page id list, process as user messages
+    if (!isPageID(senderID)) {       
+        const pages_config = getPageConfig(recipientID);
+
+        if(postback.payload) {
+            if(pages_config.features.slip_detection_api === 'true') {
+                console.log(postback.payload)
+                // await bankslipDetectionMessageHook(event)
+            }
+        }
+    }
+}
+
 const receivedMessage = async (event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
@@ -38,6 +60,7 @@ const receivedMessage = async (event) => {
 
     // PSID not in page id list, process as user messages
     if (!isPageID(senderID)) {
+        await markSeen(recipientID, senderID)
         const ctx = genContext()
         ctx.message = message
         ctx.pageScopeID = senderID
@@ -45,7 +68,8 @@ const receivedMessage = async (event) => {
         const pages_config = getPageConfig(recipientID);
         if (message.text) {
             logger.info(`Received TEXT message ${message.mid}`)
-            if (pages_config.features.pipeline === 'true') {
+            debug('features', pages_config.features)
+            if (pages_config.features.pipeline === "true") {
                 // pipeline.push(currentOrder)
                 // pipeline.push(orderDetail)
                 // pipeline.push(addOrder)
@@ -53,9 +77,13 @@ const receivedMessage = async (event) => {
                 // pipeline.push(orderCommand)
                 // pipeline.push(helpCommand)
                 // pipeline.push(menuCommand)
-                pipeline.push(greetCommand)
+                //pipeline.push(greetCommand)
 
-                await pipeline.execute(ctx)
+                //await pipeline.execute(ctx)
+            }
+
+            if(pages_config.features.slip_detection_api === 'true') {
+                await bankslipDetectionMessageHook(event)
             }
         }
 
@@ -73,8 +101,6 @@ const receivedMessage = async (event) => {
                 await bankslipDetectionQuickReplyHook(event);
             }
         }
-
-        await markSeen(recipientID, senderID)
     }
 }
 
