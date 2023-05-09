@@ -21,11 +21,11 @@ exports.getPaymentList = async (page_id, psid) => {
         })
         const data = await res.json()
 
-        console.log(data.data[0])
-        const receiverID = data.data[0].payments[0].buyer_id
+        //console.log(data.data[0])
+        //const receiverID = data.data[0].payments[0].buyer_id
         let elements = []
         for (i = 0; i < data.data[0].payments.length; i++) {
-            console.log(data.data[0].payments[i])
+            //console.log(data.data[0].payments[i])
             const obj = data.data[0].payments[i]
             const item = {
                 title: `Payment ID: ${obj.payment_id}`,

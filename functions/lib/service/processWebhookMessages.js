@@ -9,7 +9,7 @@ const PAGE_IDS = functions.config().warp.facebook.page_id;
 
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
-const { bankslipDetectionQuickReplyHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
+const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessages = async (event) => {
@@ -33,17 +33,14 @@ const receivedPostback = async (event) => {
     const recipientID = event.recipient.id
     const postback = event.postback
 
-    // debug('Incoming event', event)
-    // debug('Incoming message', message)
-
     // PSID not in page id list, process as user messages
-    if (!isPageID(senderID)) {       
+    if (!isPageID(senderID)) {
         const pages_config = getPageConfig(recipientID);
 
-        if(postback.payload) {
-            if(pages_config.features.slip_detection_api === 'true') {
+        if (postback.payload) {
+            if (pages_config.features.slip_detection_api === 'true') {
                 console.log(postback.payload)
-                // await bankslipDetectionMessageHook(event)
+                await bankslipDetectionPostbackHook(event)
             }
         }
     }
@@ -82,22 +79,22 @@ const receivedMessage = async (event) => {
                 //await pipeline.execute(ctx)
             }
 
-            if(pages_config.features.slip_detection_api === 'true') {
+            if (pages_config.features.slip_detection_api === 'true') {
                 await bankslipDetectionMessageHook(event)
             }
         }
 
         if (message.is_echo) {
             logger.info(`Received echo for message ${message.mid}`)
-            
-        } 
-        
+
+        }
+
         if (message.quick_reply) {
             const quickReplyPayload = message.quick_reply.payload
             logger.info(`Quick reply for message ${message.mid} with payload ${quickReplyPayload}`)
-            
+
             // Bankslip detection api feature
-            if(pages_config && pages_config.features.slip_detection_api === 'true') {
+            if (pages_config && pages_config.features.slip_detection_api === 'true') {
                 await bankslipDetectionQuickReplyHook(event);
             }
         }
