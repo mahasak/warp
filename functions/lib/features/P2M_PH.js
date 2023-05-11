@@ -3,9 +3,9 @@ const { getPaymentList } = require('../service/paymentList')
 const { getPaymentDetail } = require('../service/paymentDetail')
 const { triggerConfirmationFlow } = require('../service/triggerConfirmationFlow')
 const { debug, logger } = require('../logger')
-const { createInvoice, listInvoice } = require('../intgrations/invoice/p2m_ph')
+const { cancelInvoice, createInvoice, listInvoice } = require('../intgrations/invoice/p2m_ph')
 
-const { genOrderID } = require('../service/database')
+const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../service/database')
 
 exports.invoiceAPIPHMessageHook = async (event) => {
     const senderID = event.sender.id
@@ -53,9 +53,7 @@ exports.invoiceAPIPHPostbackHook = async (event) => {
     }
 
     if (postback.payload == 'P2M_PH_CANCEL_ORDER') {
-        //await sendTextMessage(recipientID, senderID, `Fetching payment detail for ${payment_id}`)
-        //await getPaymentDetail(recipientID, senderID, payment_id)
-        await sendTextMessage(recipientID, senderID, "Not implemented")
+        await cancelOrderHandler(recipientID, senderID)
     }
 
     if (postback.payload == 'P2M_PH_COMPLETE_ORDER') {
@@ -91,6 +89,7 @@ const helpHandler = async (recipientID, senderID) => {
         }
 
     ]
+
     await sendButtonTemplate(recipientID, senderID, message, buttons)
 }
 
@@ -115,4 +114,34 @@ const createOrderHandler = async (recipientID, senderID) => {
     }
 
     await createInvoice(recipientID, senderID, order_id.toString().padStart(5, '0'), "Test", product_items, null, null, null)
+}
+
+const completeOrderHandler = async (recipientID, senderID) => {
+    const currentOrder = await getCurrentOrderId(senderID)
+
+    if (currentOrder && currentOrder.invoice_id && currentOrder.invoice_id != 0) {
+        const result = await cancelInvoice(recipientID, senderID, currentOrder.invoice_id)
+        if (result === false) {
+            await sendTextMessage(recipientID, senderID, `Failed to cancel order ID [${currentOrder.invoice_id}]`)
+        } else {
+            await sendTextMessage(recipientID, senderID, `Successfully cancel order ID [${currentOrder.invoice_id}]`)
+        }
+    } else {
+        await sendTextMessage(recipientID, senderID, "No current active order")
+    }
+}
+
+const cancelOrderHandler = async (recipientID, senderID) => {
+    const currentOrder = await getCurrentOrderId(senderID)
+
+    if (currentOrder && currentOrder.invoice_id && currentOrder.invoice_id != 0) {
+        const result = await cancelInvoice(recipientID, senderID, currentOrder.invoice_id)
+        if (result === false) {
+            await sendTextMessage(recipientID, senderID, `Failed to cancel order ID [${currentOrder.invoice_id}]`)
+        } else {
+            await sendTextMessage(recipientID, senderID, `Successfully cancel order ID [${currentOrder.invoice_id}]`)
+        }
+    } else {
+        await sendTextMessage(recipientID, senderID, "No current active order")
+    }
 }

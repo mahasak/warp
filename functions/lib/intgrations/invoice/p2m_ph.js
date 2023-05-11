@@ -3,6 +3,7 @@ const ACCESS_TOKEN = functions.config().warp.facebook.access_token
 const fetch = require('node-fetch')
 const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
+const { setCurrentOrderId } = require('../../service/database')
 
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
@@ -32,8 +33,6 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         payload.shipping_address = shipping_address
     }
 
-    debug("payload", payload)
-
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {
@@ -50,17 +49,25 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         const data = await res.json()
         const recipientId = data.recipient_id
         const messageId = data.message_id
-
         console.log(data)
 
         if (res.ok) {
-            logger.info(`[messenger] Successfully send message to PSID: ${recipientId} ${messageId !== undefined ? 'messageId:' + messageId : ''}`)
+            await setCurrentOrderId(buyer_id, external_invoice_id ?? 0, data.invoice_id ?? 0)
+
+            logger.info(`[messenger] Successfully create invoice ID [${data.invoice_id ?? o}] for buyer ID [${recipientId}], page ID [${recipientId}]`)
+            return {
+                order_id: external_invoice_id,
+                invoice_id: data.invoice_id
+            }
         } else {
-            logger.error(`[messenger] Failed to send message to PSID: ${recipientId}`)
+            logger.info(`[messenger] Failed to create invoice for buyer ID [${recipientId}], page ID [${recipientId}]`)
+            return false
         }
 
     } catch (error) {
-        logger.error(`[messenger] Send API error`, error)
+        console.log(error)
+        logger.error(`[messenger] Create API error`, error)
+        return false
     }
 }
 
@@ -82,15 +89,52 @@ exports.listInvoice = async (page_id, buyer_id) => {
         const recipientId = data.recipient_id
         const messageId = data.message_id
 
-        console.log(data)
-
         if (res.ok) {
-            logger.info(`[messenger] Successfully send message to PSID: ${recipientId} ${messageId !== undefined ? 'messageId:' + messageId : ''}`)
+            logger.info(`[messenger] Successfully list for buyer ID [${buyer_id}], page ID [${page_id}]`)
         } else {
-            logger.error(`[messenger] Failed to send message to PSID: ${recipientId}`)
+            logger.error(`[messenger] Failed list for buyer ID [${buyer_id}], page ID [${page_id}]`)
         }
 
     } catch (error) {
-        logger.error(`[messenger] Send API error`, error)
+        logger.error(`[messenger] List API error`, error)
+    }
+}
+
+exports.cancelInvoice = async (page_id, buyer_id, invoice_id) => {
+    try {
+        const pageConfig = getPageConfig(page_id);
+        if (pageConfig === undefined) {
+            logger.error(`[messenger] Page ID [${page_id}] not onboarded`)
+            return
+        }
+
+        const payload = {
+            invoice_id: invoice_id
+        }
+
+        const res = await fetch(`https://graph.facebook.com/v14.0/${page_id}/invoice_access_invoice_cancel?access_token=${pageConfig.access_token}`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: { 'Content-Type': 'application/json' }
+
+        })
+
+        const data = await res.json()
+        const recipientId = data.recipient_id
+        const messageId = data.message_id
+
+        if (res.ok) {
+            await setCurrentOrderId(buyer_id, 0, 0)
+            logger.info(`[messenger] Successfully cancel for invoice ID [${invoice_id}], page ID [${page_id}]`)
+            return true
+            
+        } else {
+            logger.error(`[messenger] Failed cancel for invoice ID [${invoice_id}], page ID [${page_id}]`)
+            return false
+        }
+    } catch (error) {
+        console.log(error)
+        logger.error(`[messenger] Cancel API error`, error)
+        return false
     }
 }
