@@ -1,108 +1,18 @@
-const { sendTextMessage, sendButtonTemplate, sendQuickReplies } = require('../service/messenger')
+const { sendTextMessage, sendButtonTemplate, sendGenericTemplate,sendQuickReplies } = require('../service/messenger')
 const { getPaymentList } = require('../service/paymentList')
 const { getPaymentDetail } = require('../service/paymentDetail')
 const { triggerConfirmationFlow } = require('../service/triggerConfirmationFlow')
 const { debug, logger } = require('../logger')
-const { cancelInvoice, completeInvoice, createInvoice, listInvoice } = require('../intgrations/invoice/p2m_ph')
+const { cancelInvoice, completeInvoice, createInvoice, listInvoice, editInvoice } = require('../intgrations/invoice/p2m_ph')
 
 const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../service/database')
-
-const products = {
-    'P1': {
-        external_id: "P1",
-        name: "Pokemon mousepad",
-        quantity: 1,
-        description: "Red and blue Pokemon mousepad.",
-        price: 20
-    },
-    'P2': {
-        external_id: "P2",
-        name: "Dragonball mousepad",
-        quantity: 1,
-        description: "Super Saiyan mousepad.",
-        price: 25
-    },
-    'P3': {
-        external_id: "P3",
-        name: "One Piece mousepad",
-        quantity: 1,
-        description: "Luffy and Friend mousepad.",
-        price: 30
-    },
-    'P4': {
-        external_id: "P4",
-        name: "Power Ranger mousepad",
-        quantity: 1,
-        description: "Power Ranger mousepade standard size",
-        price: 35
-    }
-}
-
-const genProductItems = (cart) => {
-    const productItems = [];
-    const currentCartItems = Object.keys(cart);
-
-    const menuCode = Object.keys(products);
-
-    for (const itemCode of currentCartItems) {
-        if (menuCode.includes(itemCode)) {
-            productItems.push({
-                "external_id": itemCode,
-                "name": products[itemCode].name,
-                "quantity": cart[itemCode],
-                "description": products[itemCode].description,
-                "currency_amount": {
-                    "amount": parseInt(products[itemCode].price),
-                    "currency": "PHP"
-                }
-            })
-        }
-    }
-
-    return productItems
-}
-
-const defaultAdditionalAmount = [
-    {
-        type: "DISCOUNT",
-        currency_amount: {
-            "amount": "-10",
-            "currency": "PHP"
-        }
-    },
-    {
-        type: "SHIPPING",
-        currency_amount: {
-            "amount": "20",
-            "currency": "PHP"
-        }
-    },
-    {
-        type: "TAX",
-        currency_amount: {
-            "amount": "5",
-            "currency": "PHP"
-        }
-    }
-]
-
-const default_product_items = [{
-    external_id: "P1",
-    name: "Pokemon mousepad",
-    quantity: 1,
-    description: "Red and blue Pokemon mousepad.",
-    currency_amount: {
-        amount: "20.0",
-        currency: "PHP"
-    }
-}]
+const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../shared/products')
 
 exports.invoiceAPIPHMessageHook = async (event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const message = event.message
 
-    console.log("PH Message received")
     if (message.text.toString().startsWith("#order")) {
         const createCmd = message.text.split(" ");
         const cart = [];
@@ -141,7 +51,7 @@ exports.invoiceAPIPHMessageHook = async (event) => {
     }
 
     if (message.text.toString().startsWith("#product")) {
-        await sendTextMessage(recipientID, senderID, "Not implemented")
+        await listProductHandler(recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#cancel")) {
@@ -149,7 +59,14 @@ exports.invoiceAPIPHMessageHook = async (event) => {
     }
 
     if (message.text.toString().startsWith("#add")) {
-        await sendTextMessage(recipientID, senderID, "Not implemented")
+
+        const addCmd = message.text.split(" ");
+        if (addCmd.length == 1) {
+            await sendTextMessage(recipientID, senderID, "No item specified.")
+        } else {
+            const items = addCmd[1].toString().split(",")
+            await editOrderHandler(recipientID, senderID, items)
+        }
     }
 
     if (message.text.toString().startsWith("#complete")) {
@@ -173,6 +90,11 @@ exports.invoiceAPIPHPostbackHook = async (event) => {
 
     if (postback.payload == 'P2M_PH_COMPLETE_ORDER') {
         await completeOrderHandler(recipientID, senderID)
+    }
+
+    if (postback.payload.startsWith('P2M_PH_ADD_TO_ORDER')) {
+        const [keyword, item_id] = postback.payload.toString().split(':')
+        await editOrderHandler(recipientID, senderID, item_id)
     }
 }
 
@@ -209,17 +131,7 @@ const helpHandler = async (recipientID, senderID) => {
 const createOrderHandler = async (recipientID, senderID, product_items, additional_amounts) => {
     const order_id = await genOrderID(recipientID)
 
-    // const product_items = [{
-    //     external_id: "A20",
-    //     name: "Pokemon mousepad",
-    //     quantity: 1,
-    //     description: "Red and blue Pokemon mousepad.",
-    //     currency_amount: {
-    //         amount: "50.0",
-    //         currency: "PHP"
-    //     }
-    // }]
-
+    // TODO: Fix this :(
     const features = {
         "enable_messaging": true,
         "enable_product_item_removal": false,
@@ -257,4 +169,37 @@ const cancelOrderHandler = async (recipientID, senderID) => {
     } else {
         await sendTextMessage(recipientID, senderID, "No current active order")
     }
+}
+
+const editOrderHandler = async (recipientID, senderID, items) => {
+    const currentOrder = await getCurrentOrderId(senderID)
+    if (currentOrder && currentOrder.invoice_id && currentOrder.invoice_id != 0) {
+        const result = await editInvoice(recipientID, senderID, currentOrder.invoice_id, items)
+        if (result === false) {
+            await sendTextMessage(recipientID, senderID, `Failed to update order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}]`)
+        } else {
+            await sendTextMessage(recipientID, senderID, `Successfully update order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}]`)
+        }
+    } else {
+        await sendTextMessage(recipientID, senderID, "No current active order")
+    }
+}
+
+const listProductHandler = async (recipientID, senderID) => {
+    const currentOrder = await getCurrentOrderId(senderID)
+    let elements = []
+    for (const product in products) {
+        const item = {
+            title: `${products[product].external_id} - ${products[product].name}`,
+            subtitle: `${products[product].description} (${products[product].price} PHP)`,
+            buttons: [{
+                type: "postback",
+                title: "Add to Order",
+                payload: `P2M_PH_ADD_TO_ORDER:${products[product].external_id}`
+            }]
+        }
+        elements.push(item)
+    }
+
+    sendGenericTemplate(recipientID, senderID, elements)
 }

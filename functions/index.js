@@ -43,7 +43,6 @@ const webhookImpl = (req, res) => {
             //process changes
             if (pageEntry.changes !== undefined) {
                 pageEntry.changes.forEach(async function (change) {
-                    console.log(change)
                     await processWebhookChanges(change);
                 });
             }
