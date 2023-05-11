@@ -39,3 +39,23 @@ exports.genOrderID = async (page_id) => {
 
     return result
 }
+
+exports.setCurrentOrderId = async (psid, order_id, invoice_id) => {
+    const updates = {}
+    
+    updates[`users/${psid}/currentOrder`] = order_id
+    updates[`users/${psid}/currentInvoice`] = invoice_id
+
+    db.ref().update(updates);
+}
+
+exports.getCurrentOrderId = async (psid) => {
+    const currentOrderRef = await db.ref(`/users/${psid}/currentOrder`).once('value')
+    const currentInvoiceRef = await db.ref(`/users/${psid}/currentInvoice`).once('value')
+
+    return {
+        order_id: currentOrderRef.val() ?? 0,
+        invoice_id: currentInvoiceRef.val() ?? 0
+    }
+}
+
