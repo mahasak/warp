@@ -49,7 +49,6 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         const data = await res.json()
         const recipientId = data.recipient_id
         const messageId = data.message_id
-        console.log(data)
 
         if (res.ok) {
             await setCurrentOrderId(buyer_id, external_invoice_id ?? 0, data.invoice_id ?? 0)
@@ -65,7 +64,6 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         }
 
     } catch (error) {
-        console.log(error)
         logger.error(`[messenger] Create API error`, error)
         return false
     }
@@ -133,7 +131,6 @@ exports.cancelInvoice = async (page_id, buyer_id, invoice_id) => {
             return false
         }
     } catch (error) {
-        console.log(error)
         logger.error(`[messenger] Cancel API error`, error)
         return false
     }
@@ -172,7 +169,6 @@ exports.completeInvoice = async (page_id, buyer_id, invoice_id) => {
             return false
         }
     } catch (error) {
-        console.log(error)
         logger.error(`[messenger] Mark as complete API error`, error)
         return false
     }
@@ -199,13 +195,11 @@ exports.editInvoice = async (page_id, buyer_id, invoice_id, items) => {
 
         if (res.ok) {
             logger.info(`[messenger] Read detail for invoice ID [${invoice_id}], page ID [${page_id}]`)
-            console.log(data.data[0])
 
             const cart = [];
             for (const item of data.data[0].product_items) {
                 cart[item.external_id] = item.quantity
             }
-            console.log(products)
             const menuCode = Object.keys(products);
 
             for (const itemCode of items) {
@@ -227,8 +221,6 @@ exports.editInvoice = async (page_id, buyer_id, invoice_id, items) => {
                 additional_amounts: defaultAdditionalAmount,
             }
 
-            console.log(payload)
-
             const update_res = await fetch(`https://graph.facebook.com/v14.0/${page_id}/invoice_access_invoice_edit?access_token=${pageConfig.access_token}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -249,7 +241,6 @@ exports.editInvoice = async (page_id, buyer_id, invoice_id, items) => {
             return false
         }
     } catch (error) {
-        console.log(error)
         logger.error(`[messenger] Edit API error`, error)
         return false
     }

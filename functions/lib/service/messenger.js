@@ -145,7 +145,6 @@ const callSendAPI = async (page_id, messageData) => {
         const recipientId = data.recipient_id
         const messageId = data.message_id
 
-        console.log(data)
 
         if (res.ok) {
             logger.info(`[messenger] Successfully send message to PSID: ${recipientId} ${messageId !== undefined ? 'messageId:' + messageId : ''}`)

@@ -1,4 +1,4 @@
-const { sendTextMessage, sendButtonTemplate, sendQuickReplies } = require('../service/messenger')
+const { sendTextMessage, sendButtonTemplate, sendGenericTemplate,sendQuickReplies } = require('../service/messenger')
 const { getPaymentList } = require('../service/paymentList')
 const { getPaymentDetail } = require('../service/paymentDetail')
 const { triggerConfirmationFlow } = require('../service/triggerConfirmationFlow')
@@ -6,14 +6,13 @@ const { debug, logger } = require('../logger')
 const { cancelInvoice, completeInvoice, createInvoice, listInvoice, editInvoice } = require('../intgrations/invoice/p2m_ph')
 
 const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../service/database')
-const { products, genProductItems , default_product_items, defaultAdditionalAmount} = require('../shared/products')
+const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../shared/products')
 
 exports.invoiceAPIPHMessageHook = async (event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const message = event.message
 
-    console.log("PH Message received")
     if (message.text.toString().startsWith("#order")) {
         const createCmd = message.text.split(" ");
         const cart = [];
@@ -52,7 +51,7 @@ exports.invoiceAPIPHMessageHook = async (event) => {
     }
 
     if (message.text.toString().startsWith("#product")) {
-        await sendTextMessage(recipientID, senderID, "Not implemented")
+        await listProductHandler(recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#cancel")) {
@@ -62,12 +61,12 @@ exports.invoiceAPIPHMessageHook = async (event) => {
     if (message.text.toString().startsWith("#add")) {
 
         const addCmd = message.text.split(" ");
-        if(addCmd.length == 1) {
+        if (addCmd.length == 1) {
             await sendTextMessage(recipientID, senderID, "No item specified.")
         } else {
             const items = addCmd[1].toString().split(",")
             await editOrderHandler(recipientID, senderID, items)
-        }        
+        }
     }
 
     if (message.text.toString().startsWith("#complete")) {
@@ -91,6 +90,11 @@ exports.invoiceAPIPHPostbackHook = async (event) => {
 
     if (postback.payload == 'P2M_PH_COMPLETE_ORDER') {
         await completeOrderHandler(recipientID, senderID)
+    }
+
+    if (postback.payload.startsWith('P2M_PH_ADD_TO_ORDER')) {
+        const [keyword, item_id] = postback.payload.toString().split(':')
+        await editOrderHandler(recipientID, senderID, item_id)
     }
 }
 
@@ -176,6 +180,26 @@ const editOrderHandler = async (recipientID, senderID, items) => {
         } else {
             await sendTextMessage(recipientID, senderID, `Successfully update order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}]`)
         }
+    } else {
+        await sendTextMessage(recipientID, senderID, "No current active order")
     }
-    
+}
+
+const listProductHandler = async (recipientID, senderID) => {
+    const currentOrder = await getCurrentOrderId(senderID)
+    let elements = []
+    for (const product in products) {
+        const item = {
+            title: `${products[product].external_id} - ${products[product].name}`,
+            subtitle: `${products[product].description} (${products[product].price} PHP)`,
+            buttons: [{
+                type: "postback",
+                title: "Add to Order",
+                payload: `P2M_PH_ADD_TO_ORDER:${products[product].external_id}`
+            }]
+        }
+        elements.push(item)
+    }
+
+    sendGenericTemplate(recipientID, senderID, elements)
 }

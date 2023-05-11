@@ -20,8 +20,6 @@ exports.getPaymentDetail = async (page_id, psid, payment_id) => {
 
         })
         const data = await res.json()
-
-        console.log(data)
     } catch (error) {
         console.log(error)
     }

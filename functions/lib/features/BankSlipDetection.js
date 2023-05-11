@@ -83,7 +83,6 @@ exports.bankslipDetectionPostbackHook = async (event) => {
 
     if (postback.payload.startsWith('BANK_SLIP_DETAIL:')) {
         const [keyword, payment_id] = postback.payload.toString().split(':')
-        console.log(postback.payload, keyword, payment_id)
         if (payment_id !== undefined && keyword == 'BANK_SLIP_DETAIL') {
             await sendTextMessage(recipientID, senderID, `Fetching payment detail for ${payment_id}`)
             await getPaymentDetail(recipientID, senderID, payment_id)
@@ -95,8 +94,6 @@ exports.bankslipDetectionQuickReplyHook = async (event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const quickReplyPayload = event.message.quick_reply.payload
-
-    console.log(quickReplyPayload)
 
     if (quickReplyPayload.startsWith('YES_RETRY_CONFIRMATION:')) {
         const [keyword, payment_id] = quickReplyPayload.toString().split(':')
@@ -117,8 +114,6 @@ exports.bankslipDetectionMessageHook = async (event) => {
     debug("message", message)
 
     if (message.text.toString().startsWith("#payment")) {
-        console.log("test")
-        console.log(recipientID, senderID)
         await getPaymentList(recipientID, senderID)
     }
 }
