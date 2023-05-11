@@ -10,6 +10,7 @@ const PAGE_IDS = functions.config().warp.facebook.page_id;
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
 const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
+const {invoiceAPIPHMessageHook, invoiceAPIPHPostbackHook } = require('../features/P2M_PH')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessages = async (event) => {
@@ -37,12 +38,14 @@ const receivedPostback = async (event) => {
     if (!isPageID(senderID)) {
         const pages_config = getPageConfig(recipientID);
 
-        if (postback.payload) {
-            if (pages_config.features.slip_detection_api === 'true') {
-                console.log(postback.payload)
-                await bankslipDetectionPostbackHook(event)
-            }
+        if (pages_config.features.p2m_ph === "true") {
+            await invoiceAPIPHPostbackHook(event)
         }
+
+        if (pages_config.features.slip_detection_api === 'true') {
+            await bankslipDetectionPostbackHook(event)
+        }
+        
     }
 }
 
@@ -57,7 +60,7 @@ const receivedMessage = async (event) => {
 
     // PSID not in page id list, process as user messages
     if (!isPageID(senderID)) {
-        await markSeen(recipientID, senderID)
+        // await markSeen(recipientID, senderID)
         const ctx = genContext()
         ctx.message = message
         ctx.pageScopeID = senderID
@@ -65,7 +68,11 @@ const receivedMessage = async (event) => {
         const pages_config = getPageConfig(recipientID);
         if (message.text) {
             logger.info(`Received TEXT message ${message.mid}`)
-            debug('features', pages_config.features)
+
+            if (pages_config.features.p2m_ph === "true") {
+                await invoiceAPIPHMessageHook(event)
+            }
+
             if (pages_config.features.pipeline === "true") {
                 // pipeline.push(currentOrder)
                 // pipeline.push(orderDetail)

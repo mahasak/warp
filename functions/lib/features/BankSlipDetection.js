@@ -10,7 +10,6 @@ exports.bankslipDetectionChangesHook = async (change) => {
 
         const message = "We seen bank slip attached to this chat with followin data:\n" +
             "Time: " + change.value.timestamp + "\n" +
-            "Message ID:" + change.value.id + "\n" +
             "Media ID: " + change.value.media_id + "\n" +
             "Buyer ID: " + change.value.buyer_id + "\n" +
             "Page ID: " + change.value.page_id + "\n" +
@@ -70,10 +69,8 @@ exports.bankslipDetectionChangesHook = async (change) => {
             "Transaction ID: " + change.value.payment.metadata.bank_slip.bank_transfer_id + "\n" +
             "Transaction ID: " + change.value.payment.metadata.bank_slip.transaction_time + "\n" +
             "Payment Validation: " + change.value.payment.metadata.bank_slip.validation_status + "\n" +
-            "Sender Info: " + `${change.value.payment.metadata.bank_slip.sender_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id}` + "\n" +
-            "Receiver Info: " + `${change.value.payment.metadata.bank_slip.receiver_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id}` + "\n"
-
-
+            "Sender Info: " + `${change.value.payment.metadata.bank_slip.sender_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id} - ${change.value.payment.metadata.bank_slip.sender_name}` + "\n" +
+            "Receiver Info: " + `${change.value.payment.metadata.bank_slip.receiver_bank_code} - ${change.value.payment.metadata.bank_slip.receiver_bank_account_id} - ${change.value.payment.metadata.bank_slip.receiver_name}` + "\n"
 
         await sendTextMessage(change.value.page_id, change.value.payment.buyer_id, message)
     }

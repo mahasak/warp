@@ -14,11 +14,15 @@ exports.triggerConfirmationFlow = async (page_id, psid, media_id) => {
             return
         }
 
-        // TODO: fix message_id field   
+        console.log({
+            media_id: media_id,
+            buyer_id: psid
+        })
+
         const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_bank_slip_confirmation_flow/?access_token=' + pageConfig.access_token, {
             method: 'POST',
             body: JSON.stringify({
-                message_id: media_id,
+                media_id: media_id,
                 buyer_id: psid
             }),
             headers: { 'Content-Type': 'application/json' }

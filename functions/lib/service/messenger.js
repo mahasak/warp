@@ -21,16 +21,38 @@ exports.sendTextMessage = async (page_id, recipientId, messageText) => {
     await callSendAPI(page_id, messageData)
 }
 
-exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
-    logger.info(`[messenger] Sending generic message to PSID: ${recipientId}, page: ${page_id}`)
+exports.sendButtonTemplate = async (page_id, recipientId, message, buttons) => {
+    logger.info(`[messenger] Sending button template message to PSID: ${recipientId}, page: ${page_id}`)
 
-    const messageData = {
+    const payload = {
         recipient: {
             id: recipientId
         },
         message: {
             attachment: {
-                type:  "template",
+                type: "template",
+                payload: {
+                    template_type: "button",
+                    text: message,
+                    buttons: buttons
+                }
+            }
+        }
+    }
+
+    await callSendAPI(page_id, payload)
+}
+
+exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
+    logger.info(`[messenger] Sending generic message to PSID: ${recipientId}, page: ${page_id}`)
+
+    const payload = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
                 payload: {
                     template_type: "generic",
                     elements: elements
@@ -39,26 +61,26 @@ exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
         }
     }
 
-    await callSendAPI(page_id, messageData)
+    await callSendAPI(page_id, payload)
 }
 
 exports.sendMessageTemplate = async (page_id, recipientId, template) => {
     logger.info(`[messenger] Sending text message to PSID: ${recipientId}, page: ${page_id}`)
 
-    const messageData = {
+    const payload = {
         recipient: {
             id: recipientId
         },
         message: template
     }
 
-    await callSendAPI(page_id, messageData)
+    await callSendAPI(page_id, payload)
 }
 
 exports.sendQuickReplies = async (page_id, recipientId, messageText, choices) => {
     logger.info(`[messenger] Sending text message to PSID: ${recipientId}`)
 
-    const messageData = {
+    const payload = {
         recipient: {
             id: recipientId
         },
@@ -69,7 +91,7 @@ exports.sendQuickReplies = async (page_id, recipientId, messageText, choices) =>
         }
     }
 
-    await callSendAPI(page_id, messageData)
+    await callSendAPI(page_id, payload)
 }
 
 exports.sendOrderCTA = async (recipientId, messageText, orderID = 0) => {
