@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const { genContext, getPageConfig } = require('../context')
-const { sendTextMessage, markSeen } = require('./messenger')
+const { sendTextMessage, markSeen } = require('../intgrations/messenger')
 
 const { greetCommand } = require('../commands/greetCommand')
 
@@ -10,7 +10,7 @@ const PAGE_IDS = functions.config().warp.facebook.page_id;
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
 const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
-const {invoiceAPIPHMessageHook, invoiceAPIPHPostbackHook } = require('../features/P2M_PH')
+const {P2MLitePHMessageHook, P2MLitePHPostbackHook } = require('../features/P2MLitePH')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessages = async (event) => {
@@ -39,7 +39,7 @@ const receivedPostback = async (event) => {
         const pages_config = getPageConfig(recipientID);
 
         if (pages_config.features.p2m_ph === "true") {
-            await invoiceAPIPHPostbackHook(event)
+            await P2MLitePHPostbackHook(event)
         }
 
         if (pages_config.features.slip_detection_api === 'true') {
@@ -70,7 +70,7 @@ const receivedMessage = async (event) => {
             logger.info(`Received TEXT message ${message.mid}`)
 
             if (pages_config.features.p2m_ph === "true") {
-                await invoiceAPIPHMessageHook(event)
+                await P2MLitePHMessageHook(event)
             }
 
             if (pages_config.features.pipeline === "true") {

@@ -1,8 +1,10 @@
-const { sendTextMessage, sendQuickReplies } = require('../service/messenger')
-const { getPaymentList } = require('../service/paymentList')
-const { getPaymentDetail } = require('../service/paymentDetail')
-const { triggerConfirmationFlow } = require('../service/triggerConfirmationFlow')
-const { debug, logger } = require('../logger')
+
+const { sendTextMessage, sendQuickReplies } = require('../../intgrations/messenger')
+const { getPaymentList } = require('../../intgrations/BankslipDetection/paymentList')
+const { getPaymentDetail } = require('../../intgrations/BankslipDetection/paymentDetail')
+const { triggerConfirmationFlow } = require('../../intgrations/BankslipDetection/triggerConfirmationFlow')
+const { debug, logger } = require('../../logger')
+
 
 exports.bankslipDetectionChangesHook = async (change) => {
     if (change.value.event === 'bank_slip_detected') {
@@ -73,47 +75,5 @@ exports.bankslipDetectionChangesHook = async (change) => {
             "Receiver Info: " + `${change.value.payment.metadata.bank_slip.receiver_bank_code} - ${change.value.payment.metadata.bank_slip.receiver_bank_account_id} - ${change.value.payment.metadata.bank_slip.receiver_name}` + "\n"
 
         await sendTextMessage(change.value.page_id, change.value.payment.buyer_id, message)
-    }
-}
-
-exports.bankslipDetectionPostbackHook = async (event) => {
-    const senderID = event.sender.id
-    const recipientID = event.recipient.id
-    const postback = event.postback
-
-    if (postback.payload.startsWith('BANK_SLIP_DETAIL:')) {
-        const [keyword, payment_id] = postback.payload.toString().split(':')
-        if (payment_id !== undefined && keyword == 'BANK_SLIP_DETAIL') {
-            await sendTextMessage(recipientID, senderID, `Fetching payment detail for ${payment_id}`)
-            await getPaymentDetail(recipientID, senderID, payment_id)
-        }
-    }
-}
-
-exports.bankslipDetectionQuickReplyHook = async (event) => {
-    const senderID = event.sender.id
-    const recipientID = event.recipient.id
-    const quickReplyPayload = event.message.quick_reply.payload
-
-    if (quickReplyPayload.startsWith('YES_RETRY_CONFIRMATION:')) {
-        const [keyword, payment_id] = quickReplyPayload.toString().split(':')
-        await sendTextMessage(recipientID, senderID, `Triggering confimation flow for ${payment_id}`)
-        await triggerConfirmationFlow(recipientID, senderID, payment_id)
-    }
-
-    if (quickReplyPayload === 'NO_RETRY_CONFIRMATION') {
-        await sendTextMessage(recipientID, senderID, "Thankyou we valued your opinions. Good day !")
-    }
-}
-
-exports.bankslipDetectionMessageHook = async (event) => {
-    const senderID = event.sender.id
-    const recipientID = event.recipient.id
-    const message = event.message
-
-    debug("message", message)
-
-    if (message.text.toString().startsWith("#payment")) {
-        await getPaymentList(recipientID, senderID)
     }
 }
