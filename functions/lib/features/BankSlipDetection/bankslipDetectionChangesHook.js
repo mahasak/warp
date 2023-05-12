@@ -1,8 +1,8 @@
 
-const { sendTextMessage, sendQuickReplies } = require('../service/messenger')
-const { getPaymentList } = require('../../service/paymentList')
-const { getPaymentDetail } = require('../../service/paymentDetail')
-const { triggerConfirmationFlow } = require('../../service/triggerConfirmationFlow')
+const { sendTextMessage, sendQuickReplies } = require('../../service/messenger')
+const { getPaymentList } = require('../../intgrations/bankslipDetection/paymentList')
+const { getPaymentDetail } = require('../../intgrations/bankslipDetection/paymentDetail')
+const { triggerConfirmationFlow } = require('../../intgrations/bankslipDetection/triggerConfirmationFlow')
 const { debug, logger } = require('../../logger')
 
 

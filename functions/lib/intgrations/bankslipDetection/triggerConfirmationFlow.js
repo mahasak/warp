@@ -1,12 +1,12 @@
 const functions = require('firebase-functions')
 const ACCESS_TOKEN = functions.config().warp.facebook.access_token
 const fetch = require('node-fetch')
-const { debug, logger } = require('../logger')
-const { getPageConfig } = require('../context')
-const { sendGenericTemplate } = require('./messenger')
+const { debug, logger } = require('../../logger')
+const { getPageConfig } = require('../../context')
+const { sendGenericTemplate } = require('../../service/messenger')
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
-exports.getPaymentDetail = async (page_id, psid, payment_id) => {
+exports.triggerConfirmationFlow = async (page_id, psid, media_id) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {
@@ -14,8 +14,12 @@ exports.getPaymentDetail = async (page_id, psid, payment_id) => {
             return
         }
 
-        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_payments/?payment_id=' + payment_id +'&access_token=' + pageConfig.access_token, {
-            method: 'GET',
+        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_bank_slip_confirmation_flow/?access_token=' + pageConfig.access_token, {
+            method: 'POST',
+            body: JSON.stringify({
+                media_id: media_id,
+                buyer_id: psid
+            }),
             headers: { 'Content-Type': 'application/json' }
 
         })

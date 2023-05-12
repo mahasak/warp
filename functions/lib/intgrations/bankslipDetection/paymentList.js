@@ -1,9 +1,9 @@
 const functions = require('firebase-functions')
 const ACCESS_TOKEN = functions.config().warp.facebook.access_token
 const fetch = require('node-fetch')
-const { debug, logger } = require('../logger')
-const { getPageConfig } = require('../context')
-const { sendGenericTemplate } = require('./messenger')
+const { debug, logger } = require('../../logger')
+const { getPageConfig } = require('../../context')
+const { sendGenericTemplate } = require('../../service/messenger')
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
 exports.getPaymentList = async (page_id, psid) => {
