@@ -10,7 +10,7 @@ const PAGE_IDS = functions.config().warp.facebook.page_id;
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
 const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
-const {invoiceAPIPHMessageHook, invoiceAPIPHPostbackHook } = require('../features/P2M_PH')
+const {invoiceAPIPHMessageHook, invoiceAPIPHPostbackHook } = require('../features/P2MLitePH')
 const { debug, logger } = require('../logger')
 
 exports.processWebhookMessages = async (event) => {

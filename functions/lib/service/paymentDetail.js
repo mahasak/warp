@@ -14,7 +14,7 @@ exports.getPaymentDetail = async (page_id, psid, payment_id) => {
             return
         }
 
-        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_payments/' + payment_id +'&access_token=' + pageConfig.access_token, {
+        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_payments/?payment_id=' + payment_id +'&access_token=' + pageConfig.access_token, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
 
