@@ -3,7 +3,7 @@ const ACCESS_TOKEN = functions.config().warp.facebook.access_token
 const fetch = require('node-fetch')
 const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
-const { sendGenericTemplate } = require('../../service/messenger')
+const { sendGenericTemplate } = require('../messenger')
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
 exports.getPaymentDetail = async (page_id, psid, payment_id) => {

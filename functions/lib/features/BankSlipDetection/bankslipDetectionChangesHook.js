@@ -1,5 +1,5 @@
 
-const { sendTextMessage, sendQuickReplies } = require('../../service/messenger')
+const { sendTextMessage, sendQuickReplies } = require('../../intgrations/messenger')
 const { getPaymentList } = require('../../intgrations/BankslipDetection/paymentList')
 const { getPaymentDetail } = require('../../intgrations/BankslipDetection/paymentDetail')
 const { triggerConfirmationFlow } = require('../../intgrations/BankslipDetection/triggerConfirmationFlow')

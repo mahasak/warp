@@ -1,4 +1,4 @@
-const { sendTextMessage } = require('../service/messenger')
+const { sendTextMessage } = require('../intgrations/messenger')
 const {debug,logger} = require('../logger')
 
 exports.greetCommand = async (ctx, _next) => {

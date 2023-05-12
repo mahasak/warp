@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const { genContext, getPageConfig } = require('../context')
-const { sendTextMessage, markSeen } = require('./messenger')
+const { sendTextMessage, markSeen } = require('../intgrations/messenger')
 
 const { greetCommand } = require('../commands/greetCommand')
 
