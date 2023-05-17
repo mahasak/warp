@@ -1,7 +1,7 @@
 const { sendTextMessage, sendButtonTemplate, sendGenericTemplate, sendQuickReplies } = require('../../../intgrations/messenger')
-const { getPaymentList } = require('../../../intgrations/BankslipDetection/paymentList')
-const { getPaymentDetail } = require('../../../intgrations/BankslipDetection/paymentDetail')
-const { triggerConfirmationFlow } = require('../../../intgrations/BankslipDetection/triggerConfirmationFlow')
+const { getPaymentList } = require('../../../intgrations/bankslipDetection/paymentList')
+const { getPaymentDetail } = require('../../../intgrations/bankslipDetection/paymentDetail')
+const { triggerConfirmationFlow } = require('../../../intgrations/bankslipDetection/triggerConfirmationFlow')
 const { debug, logger } = require('../../../logger')
 const { cancelInvoice, completeInvoice, createInvoice, listInvoice, editInvoice } = require('../../../intgrations/P2MLitePH')
 

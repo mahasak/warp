@@ -1,17 +1,17 @@
 const functions = require('firebase-functions');
-const { genContext, getPageConfig } = require('../context')
-const { sendTextMessage, markSeen } = require('../intgrations/messenger')
+const { genContext, getPageConfig } = require('./lib/context')
+const { sendTextMessage, markSeen } = require('./lib/intgrations/messenger')
 
-const { greetCommand } = require('../commands/greetCommand')
+const { greetCommand } = require('./lib/commands/greetCommand')
 
-const Pipeline = require('../pipeline')
+const Pipeline = require('./lib/pipeline')
 const PAGE_IDS = functions.config().warp.facebook.page_id;
 
 const isPageID = (page_id) => PAGE_IDS.includes(page_id)
 
-const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('../features/BankSlipDetection')
-const {P2MLitePHMessageHook, P2MLitePHPostbackHook } = require('../features/P2MLitePH')
-const { debug, logger } = require('../logger')
+const { bankslipDetectionQuickReplyHook, bankslipDetectionPostbackHook, bankslipDetectionMessageHook } = require('./lib/features/BankSlipDetection')
+const {P2MLitePHMessageHook, P2MLitePHPostbackHook } = require('./lib/features/P2MLitePH')
+const { debug, logger } = require('./lib/logger')
 
 exports.processWebhookMessages = async (event) => {
     if (event.message) {

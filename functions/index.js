@@ -1,7 +1,7 @@
 const functions = require('firebase-functions'); 
 
-const { processWebhookMessages } = require('./lib/service/processWebhookMessages')
-const { processWebhookChanges } = require('./lib/service/processWebhookChanges')
+const { processWebhookMessages } = require('./processWebhookMessages')
+const { processWebhookChanges } = require('./processWebhookChanges')
 const { debug, logger } = require('./lib/logger')
 
 exports.webhook = functions.https.onRequest((req, res) => {
