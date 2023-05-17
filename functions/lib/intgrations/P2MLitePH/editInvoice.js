@@ -49,8 +49,6 @@ exports.editInvoice = async (page_id, buyer_id, invoice_id, items) => {
                 additional_amounts: defaultAdditionalAmount,
             }
 
-            debug("P2M Lite PH - UPDATE ORDER", payload)
-
             const update_res = await fetch(`https://graph.facebook.com/v14.0/${page_id}/invoice_access_invoice_edit?access_token=${pageConfig.access_token}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),

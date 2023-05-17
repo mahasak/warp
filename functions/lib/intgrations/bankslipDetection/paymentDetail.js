@@ -14,12 +14,38 @@ exports.getPaymentDetail = async (page_id, psid, payment_id) => {
             return
         }
 
-        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_payments/?payment_id=' + payment_id +'&access_token=' + pageConfig.access_token, {
+        const res = await fetch('https://graph.facebook.com/v14.0/' + page_id + '/invoice_access_payments/?payment_id=' + payment_id + '&access_token=' + pageConfig.access_token, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
 
         })
         const data = await res.json()
+
+        const obj = data.data[0].payments[0]
+        const item = {
+            title: `Payment ID: ${obj.payment_id}`,
+            image_url: obj.metadata.bank_slip.image_url,
+            subtitle: `${obj.payment_amount.amount} ${obj.payment_amount.currency} (${obj.metadata.bank_slip.validation_status})`,
+            default_action: {
+                type: "web_url",
+                url: obj.metadata.bank_slip.image_url,
+                messenger_extensions: false,
+                webview_height_ratio: "FULL"
+            },
+            buttons: [{
+                type: "web_url",
+                url: obj.metadata.bank_slip.image_url,
+                title: "View Bankslip"
+            }, {
+                type: "postback",
+                title: "Details",
+                payload: `BANK_SLIP_DETAIL:${obj.payment_id}`
+            }]
+        }
+        
+
+        sendGenericTemplate(page_id, psid, [item])
+        debug('INVOICE DETAIL', data)
     } catch (error) {
         console.log(error)
     }

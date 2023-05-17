@@ -24,6 +24,8 @@ exports.triggerConfirmationFlow = async (page_id, psid, media_id) => {
 
         })
         const data = await res.json()
+
+        //console.log(data)
     } catch (error) {
         console.log(error)
     }

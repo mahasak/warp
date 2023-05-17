@@ -12,7 +12,7 @@ const { bankslipDetectionChangesHook } = require('./lib/features/BankSlipDetecti
 exports.processWebhookChanges = async (change) => {
     const page_id = change.value.page_id ?? ''
     const pages_config = getPageConfig(page_id);
-
+    
     // Bank slip detection api feature
     if (pages_config && pages_config.features.slip_detection_api === 'true' && change.field === 'invoice_access_bank_slip_events') {
         await bankslipDetectionChangesHook(change)

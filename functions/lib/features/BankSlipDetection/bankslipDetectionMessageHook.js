@@ -14,4 +14,8 @@ exports.bankslipDetectionMessageHook = async (event) => {
     if (message.text.toString().startsWith("#payment")) {
         await getPaymentList(recipientID, senderID)
     }
+
+    if (message.text.toString().startsWith("#help")) {
+        await getPaymentList(recipientID, senderID)
+    }
 }

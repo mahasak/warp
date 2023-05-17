@@ -1,5 +1,5 @@
 
-const { sendTextMessage, sendQuickReplies } = require('../../intgrations/messenger')
+const { sendTextMessage, sendQuickReplies, sendButtonTemplate } = require('../../intgrations/messenger')
 const { getPaymentList } = require('../../intgrations/bankslipDetection/paymentList')
 const { getPaymentDetail } = require('../../intgrations/bankslipDetection/paymentDetail')
 const { triggerConfirmationFlow } = require('../../intgrations/bankslipDetection/triggerConfirmationFlow')
@@ -41,18 +41,37 @@ exports.bankslipDetectionChangesHook = async (change) => {
 
     if (change.value.event === 'consent_dismissed') {
         debug('CONSENT DISMISSED', change)
-        await sendQuickReplies(change.value.page_id, change.value.buyer_id, "We noticed you have been dismiss payment confirmation.Do you want to retry confirmation flow ?", [
+
+        const message = "We noticed you have been dismiss payment confirmation.Do you want to retry confirmation flow ?"
+
+        const buttons = [
             {
-                content_type: "text",
-                title: "Yes",
-                payload: `YES_RETRY_CONFIRMATION:${change.value.media_id}`
+                "type": "postback",
+                "payload": `YES_RETRY_CONFIRMATION:${change.value.media_id}`,
+                "title": "Retry Confirmation"
             },
             {
-                content_type: "text",
-                title: "No",
-                payload: "NO_RETRY_CONFIRMATION"
+                "type": "postback",
+                "payload": "NO_RETRY_CONFIRMATION",
+                "title": "No, Thanks"
             }
-        ])
+        ]
+
+        await sendButtonTemplate(change.value.page_id, change.value.buyer_id, message, buttons)
+
+        // Consider using button over quick reply in dogfooding
+        // await sendQuickReplies(change.value.page_id, change.value.buyer_id, "We noticed you have been dismiss payment confirmation.Do you want to retry confirmation flow ?", [
+        //     {
+        //         content_type: "text",
+        //         title: "Yes",
+        //         payload: `YES_RETRY_CONFIRMATION:${change.value.media_id}`
+        //     },
+        //     {
+        //         content_type: "text",
+        //         title: "No",
+        //         payload: "NO_RETRY_CONFIRMATION"
+        //     }
+        // ])
     }
 
     if (change.value.event === 'bank_slip_verified') {
