@@ -1,10 +1,10 @@
-const functions = require('firebase-functions'); 
+const functions = require('firebase-functions');
 
 const { processWebhookMessages } = require('./processWebhookMessages')
 const { processWebhookChanges } = require('./processWebhookChanges')
 const { debug, logger } = require('./lib/logger')
 
-exports.webhook = functions.https.onRequest((req, res) => {
+exports.webhook = functions.https.onRequest(async (req, res) => {
     switch (req.method) {
         case 'GET':
             verifySubscription(req, res)

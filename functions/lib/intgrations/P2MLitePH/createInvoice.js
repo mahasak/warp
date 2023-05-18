@@ -7,8 +7,9 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
     const payload = {
         buyer_id: buyer_id,
         product_items: product_items,
+        
     }
-
+    console.log(product_items)
     if (external_invoice_id !== null && external_invoice_id !== undefined) {
         payload.external_invoice_id = external_invoice_id
     }
@@ -19,6 +20,8 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
 
     if (additional_amounts !== null && additional_amounts !== undefined) {
         payload.additional_amounts = additional_amounts
+
+        console.log(additional_amounts)
     }
 
     if (features !== null && features !== undefined) {
@@ -41,6 +44,8 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
             headers: { 'Content-Type': 'application/json' }
 
         })
+
+        console.log(payload)
 
         const data = await res.json()
         const recipientId = data.recipient_id
