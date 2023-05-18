@@ -9,7 +9,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         product_items: product_items,
         
     }
-    console.log(product_items)
+    //console.log(product_items)
     if (external_invoice_id !== null && external_invoice_id !== undefined) {
         payload.external_invoice_id = external_invoice_id
     }
@@ -45,7 +45,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
 
         })
 
-        console.log(payload)
+        //console.log(JSON.stringify(payload))
 
         const data = await res.json()
         const recipientId = data.recipient_id

@@ -1,0 +1,40 @@
+{
+    "buyer_id": "6613980031967083",
+    "product_items": [
+      {
+        "external_id": "P1",
+        "name": "Pokemon mousepad",
+        "quantity": 1,
+        "description": "Red and blue Pokemon mousepad.",
+        "currency_amount": {
+          "amount": "20.0",
+          "currency": "PHP"
+        }
+      }
+    ],
+    "external_invoice_id": "00071",
+    "note": "Test",
+    "additional_amounts": [
+      {
+        "type": "DISCOUNT",
+        "currency_amount": {
+          "amount": "-10",
+          "currency": "PHP"
+        }
+      },
+      {
+        "type": "SHIPPING",
+        "currency_amount": {
+          "amount": "20",
+          "currency": "PHP"
+        }
+      },
+      {
+        "type": "TAX",
+        "currency_amount": {
+          "amount": "5",
+          "currency": "PHP"
+        }
+      }
+    ]
+  }
