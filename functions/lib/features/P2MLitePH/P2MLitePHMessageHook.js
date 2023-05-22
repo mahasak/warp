@@ -20,7 +20,7 @@ exports.P2MLitePHMessageHook = async (event) => {
 
         if (createCmd.length === 1 || createCmd[1] === '' || !isNaN(parseInt(createCmd[1]))) {
             // default order creation
-            cart['T01'] = 1
+            cart['P1'] = 1
         } else {
             const menuCode = Object.keys(products);
 

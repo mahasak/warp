@@ -9,7 +9,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         product_items: product_items,
         
     }
-    //console.log(product_items)
+    console.log(product_items)
     if (external_invoice_id !== null && external_invoice_id !== undefined) {
         payload.external_invoice_id = external_invoice_id
     }
@@ -45,7 +45,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
 
         })
 
-        //console.log(JSON.stringify(payload))
+        console.log(JSON.stringify(payload))
 
         const data = await res.json()
         const recipientId = data.recipient_id
@@ -60,6 +60,8 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
                 invoice_id: data.invoice_id
             }
         } else {
+
+            logger.error(data)
             logger.info(`[messenger] Failed to create invoice for buyer ID [${recipientId}], page ID [${recipientId}]`)
             return false
         }
