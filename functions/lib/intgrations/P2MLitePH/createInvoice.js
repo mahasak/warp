@@ -45,7 +45,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
 
         })
 
-        console.log(JSON.stringify(payload))
+        logger.info(payload)
 
         const data = await res.json()
         const recipientId = data.recipient_id
@@ -53,8 +53,9 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
 
         if (res.ok) {
             await setCurrentOrderId(buyer_id, external_invoice_id ?? 0, data.invoice_id ?? 0)
+            logger.info(data)
 
-            logger.info(`[messenger] Successfully create invoice ID [${data.invoice_id ?? o}] for buyer ID [${recipientId}], page ID [${recipientId}]`)
+            logger.info(`[messenger] Successfully create invoice ID [${data.invoice_id ?? o}] for buyer ID [${buyer_id}], page ID [${page_id}]`)
             return {
                 order_id: external_invoice_id,
                 invoice_id: data.invoice_id
@@ -62,7 +63,7 @@ exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, pro
         } else {
 
             logger.error(data)
-            logger.info(`[messenger] Failed to create invoice for buyer ID [${recipientId}], page ID [${recipientId}]`)
+            logger.info(`[messenger] Failed to create invoice for buyer ID [${buyer_id}], page ID [${page_id}]`)
             return false
         }
 
