@@ -9,7 +9,7 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../serv
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../shared/products')
 const { createOrderHandler ,cancelOrderHandler ,completeOrderHandler , editOrderHandler , helpHandler , listProductHandler } = require('./handlers')
 
-exports.P2MLitePHMessageHook = async (event) => {
+exports.P2MLitePHMessageHook = async (context, event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const message = event.message
@@ -40,38 +40,38 @@ exports.P2MLitePHMessageHook = async (event) => {
 
         const productItems = genProductItems(cart);
 
-        await createOrderHandler(recipientID, senderID, productItems, defaultAdditionalAmount)
+        await createOrderHandler(context, recipientID, senderID, productItems, defaultAdditionalAmount)
     }
 
     if (message.text.toString().startsWith("#list")) {
-        await sendTextMessage(recipientID, senderID, "Not implemented")
+        await sendTextMessage(context, recipientID, senderID, "Not implemented")
     }
 
     if (message.text.toString().startsWith("#help")) {
-        await helpHandler(recipientID, senderID)
+        await helpHandler(context, recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#product")) {
-        await listProductHandler(recipientID, senderID)
+        await listProductHandler(context, recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#cancel")) {
-        await cancelOrderHandler(recipientID, senderID)
+        await cancelOrderHandler(context, recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#add")) {
 
         const addCmd = message.text.split(" ");
         if (addCmd.length == 1) {
-            await sendTextMessage(recipientID, senderID, "No item specified.")
+            await sendTextMessage(context, recipientID, senderID, "No item specified.")
         } else {
             const items = addCmd[1].toString().split(",")
-            await editOrderHandler(recipientID, senderID, items)
+            await editOrderHandler(context, recipientID, senderID, items)
         }
     }
 
     if (message.text.toString().startsWith("#complete")) {
-        await completeOrderHandler(recipientID, senderID)
+        await completeOrderHandler(context, recipientID, senderID)
     }
 
 }

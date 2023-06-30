@@ -3,7 +3,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { setCurrentOrderId } = require('../../service/database')
 
-exports.createInvoice = async (page_id, buyer_id, external_invoice_id, note, product_items, additional_amounts, features, shipping_address) => {
+exports.createInvoice = async (context, page_id, buyer_id, external_invoice_id, note, product_items, additional_amounts, features, shipping_address) => {
     const payload = {
         buyer_id: buyer_id,
         product_items: product_items,

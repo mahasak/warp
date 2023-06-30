@@ -4,7 +4,7 @@ const { getPaymentDetail } = require('../../intgrations/bankslipDetection/paymen
 const { triggerConfirmationFlow } = require('../../intgrations/bankslipDetection/triggerConfirmationFlow')
 const { debug, logger } = require('../../logger')
 
-exports.bankslipDetectionPostbackHook = async (event) => {
+exports.bankslipDetectionPostbackHook = async (context, event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const postback = event.postback
@@ -13,17 +13,17 @@ exports.bankslipDetectionPostbackHook = async (event) => {
         const [keyword, payment_id] = postback.payload.toString().split(':')
         if (payment_id !== undefined && keyword == 'BANK_SLIP_DETAIL') {
             //await sendTextMessage(recipientID, senderID, `Fetching payment detail for ${payment_id}`)
-            await getPaymentDetail(recipientID, senderID, payment_id)
+            await getPaymentDetail(context, recipientID, senderID, payment_id)
         }
     }
 
     if (postback.payload.startsWith('YES_RETRY_CONFIRMATION:')) {
         const [keyword, payment_id] = postback.payload.toString().split(':')
-        await sendTextMessage(recipientID, senderID, `Triggering confimation flow for ${payment_id}`)
-        await triggerConfirmationFlow(recipientID, senderID, payment_id)
+        await sendTextMessage(context, recipientID, senderID, `Triggering confimation flow for ${payment_id}`)
+        await triggerConfirmationFlow(context, recipientID, senderID, payment_id)
     }
 
     if (postback.payload === 'NO_RETRY_CONFIRMATION') {
-        await sendTextMessage(recipientID, senderID, "Thankyou we valued your opinions. Good day !")
+        await sendTextMessage(context, recipientID, senderID, "Thankyou we valued your opinions. Good day !")
     }
 }

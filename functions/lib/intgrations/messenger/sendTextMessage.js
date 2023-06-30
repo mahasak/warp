@@ -5,7 +5,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.sendTextMessage = async (page_id, recipientId, messageText) => {
+exports.sendTextMessage = async (context, page_id, recipientId, messageText) => {
     logger.info(`[messenger] Sending text message to PSID: ${recipientId}, page: ${page_id}`)
 
     const messageData = {
@@ -17,5 +17,5 @@ exports.sendTextMessage = async (page_id, recipientId, messageText) => {
         }
     }
 
-    await callSendAPI(page_id, messageData)
+    await callSendAPI(context, page_id, messageData)
 }

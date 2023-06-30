@@ -5,7 +5,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.sendOrderCTA = async (recipientId, messageText, orderID = 0) => {
+exports.sendOrderCTA = async (context, recipientId, messageText, orderID = 0) => {
     logger.info(`[messenger] Sending Order CTA ${orderID !== 0 ? 'for order ID: ' + orderID : ''} to PSID: ${recipientId}`)
 
     const order = orderID == 0 ? '568543855056670' : `${orderID}`
@@ -34,5 +34,5 @@ exports.sendOrderCTA = async (recipientId, messageText, orderID = 0) => {
         }
     }
 
-    await callSendAPI(page_id, payload)
+    await callSendAPI(context, page_id, payload)
 }

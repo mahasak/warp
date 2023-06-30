@@ -9,7 +9,7 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../../s
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../../shared/products')
 
 
-exports.listProductHandler = async (recipientID, senderID) => {
+exports.listProductHandler = async (context, recipientID, senderID) => {
     const currentOrder = await getCurrentOrderId(senderID)
     let elements = []
     for (const product in products) {
@@ -25,5 +25,5 @@ exports.listProductHandler = async (recipientID, senderID) => {
         elements.push(item)
     }
 
-    sendGenericTemplate(recipientID, senderID, elements)
+    sendGenericTemplate(context, recipientID, senderID, elements)
 }

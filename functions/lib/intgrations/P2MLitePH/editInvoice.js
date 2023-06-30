@@ -3,7 +3,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../shared/products')
 
-exports.editInvoice = async (page_id, buyer_id, invoice_id, items) => {
+exports.editInvoice = async (context, page_id, buyer_id, invoice_id, items) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {

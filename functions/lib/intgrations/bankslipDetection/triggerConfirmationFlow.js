@@ -6,7 +6,7 @@ const { getPageConfig } = require('../../context')
 const { sendGenericTemplate } = require('../messenger')
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
-exports.triggerConfirmationFlow = async (page_id, psid, media_id) => {
+exports.triggerConfirmationFlow = async (context, page_id, psid, media_id) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {

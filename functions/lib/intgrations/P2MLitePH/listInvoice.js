@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 
-exports.listInvoice = async (page_id, buyer_id) => {
+exports.listInvoice = async (context, page_id, buyer_id) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {

@@ -6,7 +6,7 @@ const { triggerConfirmationFlow } = require('../../intgrations/bankslipDetection
 const { debug, logger } = require('../../logger')
 
 
-exports.bankslipDetectionChangesHook = async (change) => {
+exports.bankslipDetectionChangesHook = async (context, change) => {
     if (change.value.event === 'bank_slip_detected') {
         debug('BANK SLIP DETECTED', change)
 
@@ -17,7 +17,7 @@ exports.bankslipDetectionChangesHook = async (change) => {
             "📄 Page ID: " + change.value.page_id + "\n" +
             "📁 Event: " + change.value.event + "\n"
 
-        await sendTextMessage(change.value.page_id, change.value.buyer_id, message)
+        await sendTextMessage(context, change.value.page_id, change.value.buyer_id, message)
     }
 
     if (change.value.event === 'consent_accepted') {
@@ -30,7 +30,7 @@ exports.bankslipDetectionChangesHook = async (change) => {
             subtitle: `Event: ${change.value.event}\nMethod: ${change.value.payment.payment_method}\nMedia ID: ${change.value.media_id}`
         }
 
-        sendGenericTemplate(change.value.page_id, change.value.payment.buyer_id, [item])
+        sendGenericTemplate(context, change.value.page_id, change.value.payment.buyer_id, [item])
     }
 
 
@@ -52,7 +52,7 @@ exports.bankslipDetectionChangesHook = async (change) => {
             }
         ]
 
-        await sendButtonTemplate(change.value.page_id, change.value.buyer_id, message, buttons)
+        await sendButtonTemplate(context, change.value.page_id, change.value.buyer_id, message, buttons)
     }
 
     if (change.value.event === 'bank_slip_verified') {
@@ -76,7 +76,7 @@ exports.bankslipDetectionChangesHook = async (change) => {
             "😑 Sender: " + `${change.value.payment.metadata.bank_slip.sender_bank_code} - ${change.value.payment.metadata.bank_slip.sender_bank_account_id} - ${change.value.payment.metadata.bank_slip.sender_name}` + "\n" +
             "🤑 Receiver: " + `${change.value.payment.metadata.bank_slip.receiver_bank_code} - ${change.value.payment.metadata.bank_slip.receiver_bank_account_id} - ${change.value.payment.metadata.bank_slip.receiver_name}` + "\n"
 
-        await sendTextMessage(change.value.page_id, change.value.payment.buyer_id, message)
+        await sendTextMessage(context, change.value.page_id, change.value.payment.buyer_id, message)
     }
 }
 

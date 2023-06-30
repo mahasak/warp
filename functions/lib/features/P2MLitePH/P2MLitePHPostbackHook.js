@@ -9,33 +9,33 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../serv
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../shared/products')
 const { createOrderHandler ,cancelOrderHandler ,completeOrderHandler , editOrderHandler , helpHandler , listProductHandler } = require('./handlers')
 
-exports.P2MLitePHPostbackHook = async (event) => {
+exports.P2MLitePHPostbackHook = async (context, event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const postback = event.postback
 
     if (postback.payload == 'P2M_PH_HELP') {
-        await helpHandler(recipientID, senderID)
+        await helpHandler(context, recipientID, senderID)
     }
 
     if (postback.payload == 'P2M_PH_LIST_PRODUCT') {
-        await listProductHandler(recipientID, senderID)
+        await listProductHandler(context, recipientID, senderID)
     }
 
     if (postback.payload == 'P2M_PH_CREATE_ORDER') {
-        await createOrderHandler(recipientID, senderID, default_product_items, defaultAdditionalAmount)
+        await createOrderHandler(context, recipientID, senderID, default_product_items, defaultAdditionalAmount)
     }
 
     if (postback.payload == 'P2M_PH_CANCEL_ORDER') {
-        await cancelOrderHandler(recipientID, senderID)
+        await cancelOrderHandler(context, recipientID, senderID)
     }
 
     if (postback.payload == 'P2M_PH_COMPLETE_ORDER') {
-        await completeOrderHandler(recipientID, senderID)
+        await completeOrderHandler(context, recipientID, senderID)
     }
 
     if (postback.payload.startsWith('P2M_PH_ADD_TO_ORDER')) {
         const [keyword, item_id] = postback.payload.toString().split(':')
-        await editOrderHandler(recipientID, senderID, [item_id])
+        await editOrderHandler(context, recipientID, senderID, [item_id])
     }
 }

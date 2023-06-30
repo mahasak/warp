@@ -8,7 +8,7 @@ const { cancelInvoice, completeInvoice, createInvoice, listInvoice, editInvoice 
 const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../../service/database')
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../../shared/products')
 
-exports.helpHandler = async (recipientID, senderID) => {
+exports.helpHandler = async (context, recipientID, senderID) => {
     const message = "Available commands:\n\n"
         + "#order/#create - create order\n\n"
         + "#product - get product list\n\n"
@@ -36,5 +36,5 @@ exports.helpHandler = async (recipientID, senderID) => {
 
     ]
 
-    await sendButtonTemplate(recipientID, senderID, message, buttons)
+    await sendButtonTemplate(context, recipientID, senderID, message, buttons)
 }

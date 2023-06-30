@@ -3,6 +3,7 @@ const functions = require('firebase-functions');
 const { processWebhookMessages } = require('./processWebhookMessages')
 const { processWebhookChanges } = require('./processWebhookChanges')
 const { debug, logger } = require('./lib/logger')
+const { genHttpContext } = require('./lib/context')
 
 exports.webhook = functions.https.onRequest(async (req, res) => {
     switch (req.method) {
@@ -29,6 +30,7 @@ const verifySubscription = (req, res) => {
 }
 
 const webhookImpl = (req, res) => {
+    const httpContext = genHttpContext()
     logger.info('[webhook-handler] Incoming webhook messages/changes')
 
     const data = req.body;
@@ -37,13 +39,13 @@ const webhookImpl = (req, res) => {
             // process messaging
             if (pageEntry.messaging !== undefined) {
                 pageEntry.messaging.forEach(async function (event) {
-                    await processWebhookMessages(event)
+                    await processWebhookMessages(httpContext, event)
                 });
             }
             //process changes
             if (pageEntry.changes !== undefined) {
                 pageEntry.changes.forEach(async function (change) {
-                    await processWebhookChanges(change);
+                    await processWebhookChanges(httpContext, change);
                 });
             }
         });

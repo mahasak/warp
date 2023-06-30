@@ -5,7 +5,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.sendQuickReplies = async (page_id, recipientId, messageText, choices) => {
+exports.sendQuickReplies = async (context, page_id, recipientId, messageText, choices) => {
     logger.info(`[messenger] Sending text message to PSID: ${recipientId}`)
 
     const payload = {
@@ -19,5 +19,5 @@ exports.sendQuickReplies = async (page_id, recipientId, messageText, choices) =>
         }
     }
 
-    await callSendAPI(page_id, payload)
+    await callSendAPI(context, page_id, payload)
 }

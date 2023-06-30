@@ -4,7 +4,7 @@ const { getPaymentDetail } = require('../../intgrations/bankslipDetection/paymen
 const { triggerConfirmationFlow } = require('../../intgrations/bankslipDetection/triggerConfirmationFlow')
 const { debug, logger } = require('../../logger')
 
-exports.bankslipDetectionMessageHook = async (event) => {
+exports.bankslipDetectionMessageHook = async (context, event) => {
     const senderID = event.sender.id
     const recipientID = event.recipient.id
     const message = event.message
@@ -12,10 +12,10 @@ exports.bankslipDetectionMessageHook = async (event) => {
     debug("message", message)
 
     if (message.text.toString().startsWith("#payment")) {
-        await getPaymentList(recipientID, senderID)
+        await getPaymentList(context, recipientID, senderID)
     }
 
     if (message.text.toString().startsWith("#help")) {
-        await getPaymentList(recipientID, senderID)
+        await getPaymentList(context, recipientID, senderID)
     }
 }

@@ -9,7 +9,7 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../serv
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../shared/products')
 const { createOrderHandler ,cancelOrderHandler ,completeOrderHandler , editOrderHandler , helpHandler , listProductHandler } = require('./handlers')
 
-exports.P2MLitePHChangeHook = async (change) => {
+exports.P2MLitePHChangeHook = async (context, change) => {
     debug('CHANGE', change)
     if (change.value.event === 'invoice_access_invoice_change') {
         debug('INVOICE CHANGE', change)
@@ -21,7 +21,7 @@ exports.P2MLitePHChangeHook = async (change) => {
             "📄 Page ID: " + change.value.page_id + "\n" +
             "📁 Event: " + change.value.event + "\n"
 
-        await sendTextMessage(change.value.page_id, change.value.buyer_id, message)
+        await sendTextMessage(context, change.value.page_id, change.value.buyer_id, message)
     }
 
 }

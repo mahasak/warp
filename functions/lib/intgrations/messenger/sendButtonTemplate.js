@@ -5,7 +5,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.sendButtonTemplate = async (page_id, recipientId, message, buttons) => {
+exports.sendButtonTemplate = async (context, page_id, recipientId, message, buttons) => {
     logger.info(`[messenger] Sending button template message to PSID: ${recipientId}, page: ${page_id}`)
 
     const payload = {
@@ -24,5 +24,5 @@ exports.sendButtonTemplate = async (page_id, recipientId, message, buttons) => {
         }
     }
 
-    await callSendAPI(page_id, payload)
+    await callSendAPI(context, page_id, payload)
 }

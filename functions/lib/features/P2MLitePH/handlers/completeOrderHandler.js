@@ -9,17 +9,17 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../../s
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../../shared/products')
 
 
-exports.completeOrderHandler = async (recipientID, senderID) => {
+exports.completeOrderHandler = async (context, recipientID, senderID) => {
     const currentOrder = await getCurrentOrderId(senderID)
 
     if (currentOrder && currentOrder.invoice_id && currentOrder.invoice_id != 0) {
         const result = await completeInvoice(recipientID, senderID, currentOrder.invoice_id)
         if (result === false) {
-            await sendTextMessage(recipientID, senderID, `Failed to mark order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}] as completed`)
+            await sendTextMessage(context, recipientID, senderID, `Failed to mark order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}] as completed`)
         } else {
-            await sendTextMessage(recipientID, senderID, `Successfully mark order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}] as completed`)
+            await sendTextMessage(context, recipientID, senderID, `Successfully mark order ID [${currentOrder.order_id}]/invoice ID [${currentOrder.invoice_id}] as completed`)
         }
     } else {
-        await sendTextMessage(recipientID, senderID, "No current active order")
+        await sendTextMessage(context, recipientID, senderID, "No current active order")
     }
 }

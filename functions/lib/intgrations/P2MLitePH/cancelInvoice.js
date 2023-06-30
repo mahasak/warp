@@ -3,7 +3,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { setCurrentOrderId } = require('../../service/database')
 
-exports.cancelInvoice = async (page_id, buyer_id, invoice_id) => {
+exports.cancelInvoice = async (context, page_id, buyer_id, invoice_id) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {

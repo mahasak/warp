@@ -5,7 +5,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.markSeen = async (page_id, psid) => {
+exports.markSeen = async (context, page_id, psid) => {
     logger.info(`[messenger] Marking messages as seen for ${psid}`)
 
     const messageData = {
@@ -15,5 +15,5 @@ exports.markSeen = async (page_id, psid) => {
         "sender_action": "mark_seen"
     }
 
-    await callSendAPI(page_id, messageData)
+    await callSendAPI(context, page_id, messageData)
 }

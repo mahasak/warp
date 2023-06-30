@@ -6,7 +6,7 @@ const { debug, logger } = require('../../logger')
 const { getPageConfig } = require('../../context')
 const { callSendAPI } = require('./callSendAPI')
 
-exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
+exports.sendGenericTemplate = async (context, page_id, recipientId, elements) => {
     logger.info(`[messenger] Sending generic message to PSID: ${recipientId}, page: ${page_id}`)
 
     const payload = {
@@ -24,5 +24,5 @@ exports.sendGenericTemplate = async (page_id, recipientId, elements) => {
         }
     }
 
-    await callSendAPI(page_id, payload)
+    await callSendAPI(context, page_id, payload)
 }

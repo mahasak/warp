@@ -6,7 +6,7 @@ const { getPageConfig } = require('../../context')
 const { sendGenericTemplate } = require('../messenger')
 const PAGE_CONFIGS = functions.config().warp.facebook.pages_config;
 
-exports.getPaymentList = async (page_id, psid) => {
+exports.getPaymentList = async (context, page_id, psid) => {
     try {
         const pageConfig = getPageConfig(page_id);
         if (pageConfig === undefined) {
@@ -48,7 +48,7 @@ exports.getPaymentList = async (page_id, psid) => {
             elements.push(item)
         }        
 
-        sendGenericTemplate(page_id, psid, elements)
+        sendGenericTemplate(request_id, page_id, psid, elements)
     } catch (error) {
         console.log(error)
     }

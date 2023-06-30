@@ -9,7 +9,7 @@ const { genOrderID, getCurrentOrderId, setCurrentOrderId } = require('../../../s
 const { products, genProductItems, default_product_items, defaultAdditionalAmount } = require('../../../shared/products')
 
 
-exports.createOrderHandler = async (recipientID, senderID, product_items, additional_amounts) => {
+exports.createOrderHandler = async (context, recipientID, senderID, product_items, additional_amounts) => {
     const order_id = await genOrderID(recipientID)
 
     // TODO: Fix this :(
@@ -19,5 +19,5 @@ exports.createOrderHandler = async (recipientID, senderID, product_items, additi
         "allowed_payment_methods": ["hpp_payment_link"]
     }
 
-    await createInvoice(recipientID, senderID, order_id.toString().padStart(5, '0'), "Test", product_items, additional_amounts, null, null)
+    await createInvoice(context, recipientID, senderID, order_id.toString().padStart(5, '0'), "Test", product_items, additional_amounts, null, null)
 }
